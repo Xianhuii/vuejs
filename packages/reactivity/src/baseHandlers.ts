@@ -108,7 +108,7 @@ class BaseReactiveHandler implements ProxyHandler<Target> {
     }
 
     if (!isReadonly) {
-      track(target, TrackOpTypes.GET, key)
+      track(target, TrackOpTypes.GET, key) // jxh: 收集副作用函数
     }
 
     if (isShallow) {
@@ -136,13 +136,21 @@ class MutableReactiveHandler extends BaseReactiveHandler {
     super(false, isShallow)
   }
 
-  set(
-    target: Record<string | symbol, unknown>,
-    key: string | symbol,
-    value: unknown,
-    receiver: object,
+  /**
+   * A trap for setting a property value.
+   * @param target The original object which is being proxied.
+   * @param key The name or `Symbol` of the property to set.
+   * @param value
+   * @param receiver The object to which the assignment was originally directed.
+   * @returns A `Boolean` indicating whether or not the property was set.
+   */
+  set( // jxh: 代理set方法
+    target: Record<string | symbol, unknown>, // jxh: 原始目标对象
+    key: string | symbol, // jxh: 属性名
+    value: unknown, // jxh: 属性值
+    receiver: object, // jxh: 代理对象
   ): boolean {
-    let oldValue = target[key]
+    let oldValue = target[key] // jxh: 获取目标对象中的属性值
     if (!this._isShallow) {
       const isOldValueReadonly = isReadonly(oldValue)
       if (!isShallow(value) && !isReadonly(value)) {
@@ -165,7 +173,7 @@ class MutableReactiveHandler extends BaseReactiveHandler {
       isArray(target) && isIntegerKey(key)
         ? Number(key) < target.length
         : hasOwn(target, key)
-    const result = Reflect.set(
+    const result = Reflect.set( // jxh: 通过反射给属性设置值
       target,
       key,
       value,
@@ -173,6 +181,7 @@ class MutableReactiveHandler extends BaseReactiveHandler {
     )
     // don't trigger if target is something up in the prototype chain of original
     if (target === toRaw(receiver)) {
+      // jxh: 触发副作用函数
       if (!hadKey) {
         trigger(target, TriggerOpTypes.ADD, key, value)
       } else if (hasChanged(value, oldValue)) {
@@ -190,7 +199,7 @@ class MutableReactiveHandler extends BaseReactiveHandler {
     const oldValue = target[key]
     const result = Reflect.deleteProperty(target, key)
     if (result && hadKey) {
-      trigger(target, TriggerOpTypes.DELETE, key, undefined, oldValue)
+      trigger(target, TriggerOpTypes.DELETE, key, undefined, oldValue) // jxh: 触发副作用函数
     }
     return result
   }
@@ -198,7 +207,7 @@ class MutableReactiveHandler extends BaseReactiveHandler {
   has(target: Record<string | symbol, unknown>, key: string | symbol): boolean {
     const result = Reflect.has(target, key)
     if (!isSymbol(key) || !builtInSymbols.has(key)) {
-      track(target, TrackOpTypes.HAS, key)
+      track(target, TrackOpTypes.HAS, key) // jxh: 收集副作用函数
     }
     return result
   }

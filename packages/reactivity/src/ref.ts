@@ -23,7 +23,7 @@ import { warn } from './warning'
 declare const RefSymbol: unique symbol
 export declare const RawSymbol: unique symbol
 
-export interface Ref<T = any, S = T> {
+export interface Ref<T = any, S = T> { // jxh: 封装原始数据类型，用于代理
   get value(): T
   set value(_: S)
   /**
@@ -56,7 +56,7 @@ export function ref<T>(
   value: T,
 ): [T] extends [Ref] ? IfAny<T, Ref<T>, T> : Ref<UnwrapRef<T>, UnwrapRef<T> | T>
 export function ref<T = any>(): Ref<T | undefined>
-export function ref(value?: unknown) {
+export function ref(value?: unknown) { // jxh: 创建引用
   return createRef(value, false)
 }
 
@@ -103,7 +103,7 @@ function createRef(rawValue: unknown, shallow: boolean) {
 /**
  * @internal
  */
-class RefImpl<T = any> {
+class RefImpl<T = any> { // jxh: 引用实现类
   _value: T
   private _rawValue: T
 

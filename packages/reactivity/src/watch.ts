@@ -113,7 +113,7 @@ export function onWatcherCleanup(
   }
 }
 
-export function watch(
+export function watch( // jxh: 创建监听属性
   source: WatchSource | WatchSource[] | WatchEffect | object,
   cb?: WatchCallback | null,
   options: WatchOptions = EMPTY_OBJ,
@@ -234,7 +234,7 @@ export function watch(
     ? new Array((source as []).length).fill(INITIAL_WATCHER_VALUE)
     : INITIAL_WATCHER_VALUE
 
-  const job = (immediateFirstRun?: boolean) => {
+  const job = (immediateFirstRun?: boolean) => { // jxh: 监听回调
     if (
       !(effect.flags & EffectFlags.ACTIVE) ||
       (!effect.dirty && !immediateFirstRun)

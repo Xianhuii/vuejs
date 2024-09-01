@@ -127,8 +127,8 @@ export class ComputedRefImpl<T = any> implements Subscriber {
           type: TrackOpTypes.GET,
           key: 'value',
         })
-      : this.dep.track()
-    refreshComputed(this)
+      : this.dep.track() // jxh: 获取副作用函数
+    refreshComputed(this) // jxh: 执行副作用函数，刷新计算属性
     // sync version after evaluation
     if (link) {
       link.version = this.dep.version
@@ -186,7 +186,7 @@ export function computed<T, S = T>(
   options: WritableComputedOptions<T, S>,
   debugOptions?: DebuggerOptions,
 ): WritableComputedRef<T, S>
-export function computed<T>(
+export function computed<T>( // jxh: 创建计算属性
   getterOrOptions: ComputedGetter<T> | WritableComputedOptions<T>,
   debugOptions?: DebuggerOptions,
   isSSR = false,

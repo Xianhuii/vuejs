@@ -45,16 +45,16 @@ export class Dep {
     }
   }
 
-  track(debugInfo?: DebuggerEventExtraInfo): Link | undefined {
+  track(debugInfo?: DebuggerEventExtraInfo): Link | undefined { // jxh: 收集响应属性的副作用函数
     if (!activeSub || !shouldTrack) {
       return
     }
 
     let link = this.activeLink
-    if (link === undefined || link.sub !== activeSub) {
-      link = this.activeLink = {
+    if (link === undefined /* jxh: 第一次收集副作用函数 */ || link.sub !== activeSub) {
+      link = this.activeLink = { // jxh: 创建link
         dep: this,
-        sub: activeSub,
+        sub: activeSub, // jxh: 副作用函数
         version: this.version,
         nextDep: undefined,
         prevDep: undefined,
@@ -63,7 +63,7 @@ export class Dep {
         prevActiveLink: undefined,
       }
 
-      // add the link to the activeEffect as a dep (as tail)
+      // add the link to the activeEffect as a dep (as tail) // jxh: 添加副作用函数到activeEffect链表
       if (!activeSub.deps) {
         activeSub.deps = activeSub.depsTail = link
       } else {
@@ -121,7 +121,7 @@ export class Dep {
     this.notify(debugInfo)
   }
 
-  notify(debugInfo?: DebuggerEventExtraInfo): void {
+  notify(debugInfo?: DebuggerEventExtraInfo): void { // jxh: 通知副作用函数
     startBatch()
     try {
       if (__DEV__) {
@@ -146,10 +146,10 @@ export class Dep {
         }
       }
       for (let link = this.subs; link; link = link.prevSub) {
-        link.sub.notify()
+        link.sub.notify() // jxh: 通知订阅者（设置副作用函数）
       }
     } finally {
-      endBatch()
+      endBatch() // jxh: 触发副作用函数
     }
   }
 }
@@ -205,15 +205,15 @@ export const ARRAY_ITERATE_KEY: unique symbol = Symbol(
  * @param type - Defines the type of access to the reactive property.
  * @param key - Identifier of the reactive property to track.
  */
-export function track(target: object, type: TrackOpTypes, key: unknown): void {
+export function track(target: object, type: TrackOpTypes, key: unknown): void { // jxh: 收集响应式对象的响应属性
   if (shouldTrack && activeSub) {
     let depsMap = targetMap.get(target)
     if (!depsMap) {
-      targetMap.set(target, (depsMap = new Map()))
+      targetMap.set(target, (depsMap = new Map())) // jxh: 如果depsMap为空，新建空Map
     }
     let dep = depsMap.get(key)
     if (!dep) {
-      depsMap.set(key, (dep = new Dep()))
+      depsMap.set(key, (dep = new Dep())) // jxh: 如果属性对应dep为空，新建dep
     }
     if (__DEV__) {
       dep.track({
@@ -222,7 +222,7 @@ export function track(target: object, type: TrackOpTypes, key: unknown): void {
         key,
       })
     } else {
-      dep.track()
+      dep.track() // jxh: 收集响应属性的副作用函数
     }
   }
 }
@@ -235,7 +235,7 @@ export function track(target: object, type: TrackOpTypes, key: unknown): void {
  * @param type - Defines the type of the operation that needs to trigger effects.
  * @param key - Can be used to target a specific reactive property in the target object.
  */
-export function trigger(
+export function trigger( // jxh: 触发副作用函数
   target: object,
   type: TriggerOpTypes,
   key?: unknown,
@@ -243,15 +243,15 @@ export function trigger(
   oldValue?: unknown,
   oldTarget?: Map<unknown, unknown> | Set<unknown>,
 ): void {
-  const depsMap = targetMap.get(target)
+  const depsMap = targetMap.get(target) // jxh: 获取代理目标对象的副作用函数集合
   if (!depsMap) {
     // never been tracked
     globalVersion++
     return
   }
 
-  let deps: Dep[] = []
-  if (type === TriggerOpTypes.CLEAR) {
+  let deps: Dep[] = [] // jxh: 待执行的副作用函数
+  if (type === TriggerOpTypes.CLEAR) { // jxh: 获取所有副作用函数
     // collection being cleared
     // trigger all effects for target
     deps = [...depsMap.values()]
@@ -259,7 +259,7 @@ export function trigger(
     const targetIsArray = isArray(target)
     const isArrayIndex = targetIsArray && isIntegerKey(key)
 
-    if (targetIsArray && key === 'length') {
+    if (targetIsArray && key === 'length') { // jxh: 获取length的副作用函数
       const newLength = Number(newValue)
       depsMap.forEach((dep, key) => {
         if (
@@ -314,7 +314,7 @@ export function trigger(
   }
 
   startBatch()
-  for (const dep of deps) {
+  for (const dep of deps) { // jxh: 遍历触发副作用函数
     if (__DEV__) {
       dep.trigger({
         target,

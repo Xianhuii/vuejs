@@ -89,17 +89,17 @@ export type Reactive<T> = UnwrapNestedRefs<T> &
  * @see {@link https://vuejs.org/api/reactivity-core.html#reactive}
  */
 export function reactive<T extends object>(target: T): Reactive<T>
-export function reactive(target: object) {
+export function reactive(target: object) { //jxh: 创建响应式代理对象
   // if trying to observe a readonly proxy, return the readonly version.
-  if (isReadonly(target)) {
+  if (isReadonly(target)) { //jxh: 只读对象没有副作用，不用进行代理
     return target
   }
-  return createReactiveObject(
-    target,
-    false,
-    mutableHandlers,
-    mutableCollectionHandlers,
-    reactiveMap,
+  return createReactiveObject( //jxh: 创建响应式代理对象
+    target, //jxh: 被代理目标对象
+    false, //jxh: 是否只读
+    mutableHandlers, //jxh: 基础代理副作用函数
+    mutableCollectionHandlers, //jxh: 集合类代理副作用函数
+    reactiveMap, //jxh: 存放代理对象，target-proxy键值对
   )
 }
 
@@ -289,11 +289,11 @@ function createReactiveObject(
   if (targetType === TargetType.INVALID) {
     return target
   }
-  const proxy = new Proxy(
+  const proxy = new Proxy(//jxh: 创建代理对象
     target,
     targetType === TargetType.COLLECTION ? collectionHandlers : baseHandlers,
   )
-  proxyMap.set(target, proxy)
+  proxyMap.set(target, proxy) //jxh: 缓存代理对象
   return proxy
 }
 
@@ -418,7 +418,7 @@ export function markRaw<T extends object>(value: T): Raw<T> {
  *
  * @param value - The value for which a reactive proxy shall be created.
  */
-export const toReactive = <T extends unknown>(value: T): T =>
+export const toReactive = <T extends unknown>(value: T): T => // jxh: 创建响应式对象API接口
   isObject(value) ? reactive(value) : value
 
 /**

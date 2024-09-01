@@ -36,7 +36,7 @@ export interface ReactiveEffectRunner<T = any> {
   effect: ReactiveEffect
 }
 
-export let activeSub: Subscriber | undefined
+export let activeSub: Subscriber | undefined // jxh: 当前活跃的订阅者
 
 export enum EffectFlags {
   ACTIVE = 1 << 0,
@@ -168,7 +168,7 @@ export class ReactiveEffect<T = any>
     ) {
       return
     }
-    if (!(this.flags & EffectFlags.NOTIFIED)) {
+    if (!(this.flags & EffectFlags.NOTIFIED)) {  // 设置副作用函数
       this.flags |= EffectFlags.NOTIFIED
       this.nextEffect = batchedEffect
       batchedEffect = this
@@ -184,7 +184,7 @@ export class ReactiveEffect<T = any>
     }
 
     this.flags |= EffectFlags.RUNNING
-    cleanupEffect(this)
+    cleanupEffect(this) // jxh: 移除副作用函数
     prepareDeps(this)
     const prevEffect = activeSub
     const prevShouldTrack = shouldTrack
@@ -192,7 +192,7 @@ export class ReactiveEffect<T = any>
     shouldTrack = true
 
     try {
-      return this.fn()
+      return this.fn() // jxh: 执行副作用函数
     } finally {
       if (__DEV__ && activeSub !== this) {
         warn(
@@ -219,13 +219,13 @@ export class ReactiveEffect<T = any>
     }
   }
 
-  trigger(): void {
+  trigger(): void { // jxh: 触发副作用函数
     if (this.flags & EffectFlags.PAUSED) {
       pausedQueueEffects.add(this)
     } else if (this.scheduler) {
-      this.scheduler()
+      this.scheduler() // jxh: 调度执行，管理副作用函数执行的时机、次数、方式
     } else {
-      this.runIfDirty()
+      this.runIfDirty() // jxh: 触发副作用函数
     }
   }
 
@@ -272,7 +272,7 @@ export function endBatch(): void {
       e.flags &= ~EffectFlags.NOTIFIED
       if (e.flags & EffectFlags.ACTIVE) {
         try {
-          e.trigger()
+          e.trigger() // jxh: 触发副作用函数
         } catch (err) {
           if (!error) error = err
         }
@@ -369,7 +369,7 @@ export function refreshComputed(computed: ComputedRefImpl): false | undefined {
   // and therefore tracks no deps, thus we cannot rely on the dirty check.
   // Instead, computed always re-evaluate and relies on the globalVersion
   // fast path above for caching.
-  if (dep.version > 0 && !computed.isSSR && !isDirty(computed)) {
+  if (dep.version > 0 && !computed.isSSR && !isDirty(computed)) { // jxh: 是否重新计算
     computed.flags &= ~EffectFlags.RUNNING
     return
   }
@@ -381,7 +381,7 @@ export function refreshComputed(computed: ComputedRefImpl): false | undefined {
 
   try {
     prepareDeps(computed)
-    const value = computed.fn()
+    const value = computed.fn() // jxh: 刷新计算属性
     if (dep.version === 0 || hasChanged(value, computed._value)) {
       computed._value = value
       dep.version++
