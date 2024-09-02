@@ -177,7 +177,7 @@ function createCodegenContext(
     helper(key) {
       return `_${helperNameMap[key]}`
     },
-    push(code, newlineIndex = NewlineType.None, node) {
+    push(code, newlineIndex = NewlineType.None, node) { // jxh: 添加代码
       context.code += code
       if (!__BROWSER__ && context.map) {
         if (node) {
@@ -276,7 +276,7 @@ function createCodegenContext(
   return context
 }
 
-export function generate(
+export function generate( // jxh: 生成渲染函数代码
   ast: RootNode,
   options: CodegenOptions & {
     onContextCreated?: (context: CodegenContext) => void
@@ -395,7 +395,7 @@ export function generate(
 
   return {
     ast,
-    code: context.code,
+    code: context.code, // jxh: 渲染函数代码
     preamble: isSetupInlined ? preambleContext.code : ``,
     map: context.map ? context.map.toJSON() : undefined,
   }
@@ -643,7 +643,7 @@ function genNodeList(
   }
 }
 
-function genNode(node: CodegenNode | symbol | string, context: CodegenContext) {
+function genNode(node: CodegenNode | symbol | string, context: CodegenContext) { // jxh: 生成JavaScript函数
   if (isString(node)) {
     context.push(node, NewlineType.Unknown)
     return

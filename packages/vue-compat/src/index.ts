@@ -22,7 +22,7 @@ import {
 
 const compileCache: Record<string, RenderFunction> = Object.create(null)
 
-function compileToFunction(
+function compileToFunction( // jxh: 获取编译函数
   template: string | HTMLElement,
   options?: CompilerOptions,
 ): RenderFunction {
@@ -98,9 +98,9 @@ function compileToFunction(
   return (compileCache[key] = render)
 }
 
-registerRuntimeCompiler(compileToFunction)
+registerRuntimeCompiler(compileToFunction) // jxh: 注册运行时编译函数
 
 const Vue: CompatVue = createCompatVue()
-Vue.compile = compileToFunction
+Vue.compile = compileToFunction // jxh: 注册默认编译函数
 
 export default Vue

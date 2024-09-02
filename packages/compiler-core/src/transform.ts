@@ -328,7 +328,7 @@ export function createTransformContext(
   return context
 }
 
-export function transform(root: RootNode, options: TransformOptions): void {
+export function transform(root: RootNode, options: TransformOptions): void { // jxh: 将模板AST转换成JavaScript AST
   const context = createTransformContext(root, options)
   traverseNode(root, context)
   if (options.hoistStatic) {
@@ -421,7 +421,7 @@ export function traverseChildren(
   }
 }
 
-export function traverseNode(
+export function traverseNode( // jxh: 将模板AST转换成JavaScript AST
   node: RootNode | TemplateChildNode,
   context: TransformContext,
 ): void {
@@ -448,14 +448,14 @@ export function traverseNode(
   }
 
   switch (node.type) {
-    case NodeTypes.COMMENT:
+    case NodeTypes.COMMENT: // jxh: 解析注释
       if (!context.ssr) {
         // inject import for the Comment symbol, which is needed for creating
         // comment nodes with `createVNode`
         context.helper(CREATE_COMMENT)
       }
       break
-    case NodeTypes.INTERPOLATION:
+    case NodeTypes.INTERPOLATION: // jxh: 解析插值
       // no need to traverse, but we need to inject toString helper
       if (!context.ssr) {
         context.helper(TO_DISPLAY_STRING)
@@ -463,15 +463,15 @@ export function traverseNode(
       break
 
     // for container types, further traverse downwards
-    case NodeTypes.IF:
+    case NodeTypes.IF: // jxh: 解析if
       for (let i = 0; i < node.branches.length; i++) {
         traverseNode(node.branches[i], context)
       }
       break
-    case NodeTypes.IF_BRANCH:
-    case NodeTypes.FOR:
-    case NodeTypes.ELEMENT:
-    case NodeTypes.ROOT:
+    case NodeTypes.IF_BRANCH: // jxh: 解析if分支
+    case NodeTypes.FOR: // jxh: 解析for
+    case NodeTypes.ELEMENT: // jxh: 解析元素
+    case NodeTypes.ROOT: // 解析根节点
       traverseChildren(node, context)
       break
   }

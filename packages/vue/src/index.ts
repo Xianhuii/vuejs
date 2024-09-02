@@ -39,7 +39,7 @@ function getCache(options?: CompilerOptions) {
   return c
 }
 
-function compileToFunction(
+function compileToFunction( // jxh: 获取编译函数
   template: string | HTMLElement,
   options?: CompilerOptions,
 ): RenderFunction {
@@ -84,7 +84,7 @@ function compileToFunction(
     opts.isCustomElement = tag => !!customElements.get(tag)
   }
 
-  const { code } = compile(template, opts)
+  const { code } = compile(template, opts) // 获取编译后的渲染函数
 
   function onError(err: CompilerError, asWarning = false) {
     const message = asWarning
@@ -106,7 +106,7 @@ function compileToFunction(
   // the wildcard object.
   const render = (
     __GLOBAL__ ? new Function(code)() : new Function('Vue', code)(runtimeDom)
-  ) as RenderFunction
+  ) as RenderFunction // jxh: 将编译后的渲染函数代码创建成Function
 
   // mark the function as runtime compiled
   ;(render as InternalRenderFunction)._rc = true

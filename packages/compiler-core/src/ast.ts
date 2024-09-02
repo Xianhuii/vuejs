@@ -222,7 +222,7 @@ export enum ConstantTypes {
   CAN_STRINGIFY,
 }
 
-export interface SimpleExpressionNode extends Node {
+export interface SimpleExpressionNode extends Node { // jxh: 简单表达式节点
   type: NodeTypes.SIMPLE_EXPRESSION
   content: string
   isStatic: boolean

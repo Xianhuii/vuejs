@@ -62,7 +62,7 @@ export function getBaseTransformPreset(
 
 // we name it `baseCompile` so that higher order compilers like
 // @vue/compiler-dom can export `compile` while re-exporting everything else.
-export function baseCompile(
+export function baseCompile( // jxh: 执行编译
   source: string | RootNode,
   options: CompilerOptions = {},
 ): CodegenResult {
@@ -90,7 +90,7 @@ export function baseCompile(
   const resolvedOptions = extend({}, options, {
     prefixIdentifiers,
   })
-  const ast = isString(source) ? baseParse(source, resolvedOptions) : source
+  const ast = isString(source) ? baseParse(source, resolvedOptions) /*jxh: 将模板字符串解析成模板AST*/ : source
   const [nodeTransforms, directiveTransforms] =
     getBaseTransformPreset(prefixIdentifiers)
 
@@ -101,7 +101,7 @@ export function baseCompile(
     }
   }
 
-  transform(
+  transform( // jxh: 将模板AST转换成JavaScript AST
     ast,
     extend({}, resolvedOptions, {
       nodeTransforms: [
@@ -116,5 +116,5 @@ export function baseCompile(
     }),
   )
 
-  return generate(ast, resolvedOptions)
+  return generate(ast, resolvedOptions) // jxh: 生成渲染函数代码
 }

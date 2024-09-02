@@ -84,7 +84,7 @@ const defaultDelimitersOpen = new Uint8Array([123, 123]) // "{{"
 const defaultDelimitersClose = new Uint8Array([125, 125]) // "}}"
 
 /** All the states the tokenizer can be in. */
-export enum State {
+export enum State { // jxh: 状态机的状态
   Text = 1,
 
   // interpolation
@@ -925,9 +925,9 @@ export default class Tokenizer {
    *
    * States that are more likely to be hit are higher up, as a performance improvement.
    */
-  public parse(input: string): void {
+  public parse(input: string): void { // jxh: 解析模板字符串为模板AST
     this.buffer = input
-    while (this.index < this.buffer.length) {
+    while (this.index < this.buffer.length) { // jxh: 编译字符串，根据状态机解析
       const c = this.buffer.charCodeAt(this.index)
       if (c === CharCodes.NewLine) {
         this.newlines.push(this.index)

@@ -487,7 +487,7 @@ const tokenizer = new Tokenizer(stack, {
 const forIteratorRE = /,([^,\}\]]*)(?:,([^,\}\]]*))?$/
 const stripParensRE = /^\(|\)$/g
 
-function parseForExpression(
+function parseForExpression( // jxh: 解析简单表达式
   input: SimpleExpressionNode,
 ): ForParseResult | undefined {
   const loc = input.loc
@@ -968,7 +968,7 @@ enum ExpParseMode {
   Skip,
 }
 
-function createExp(
+function createExp( // jxh: 创建表达式
   content: SimpleExpressionNode['content'],
   isStatic: SimpleExpressionNode['isStatic'] = false,
   loc: SourceLocation,
@@ -1025,7 +1025,7 @@ function reset() {
   stack.length = 0
 }
 
-export function baseParse(input: string, options?: ParserOptions): RootNode {
+export function baseParse(input: string, options?: ParserOptions): RootNode { // / jxh: 解析模板字符串为模板AST
   reset()
   currentInput = input
   currentOptions = extend({}, defaultParserOptions)
@@ -1071,7 +1071,7 @@ export function baseParse(input: string, options?: ParserOptions): RootNode {
   }
 
   const root = (currentRoot = createRoot([], input))
-  tokenizer.parse(currentInput)
+  tokenizer.parse(currentInput) // jxh: 解析模板
   root.loc = getLoc(0, input.length)
   root.children = condenseWhitespace(root.children)
   currentRoot = null

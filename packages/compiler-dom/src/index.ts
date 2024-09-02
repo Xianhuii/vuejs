@@ -38,7 +38,7 @@ export const DOMDirectiveTransforms: Record<string, DirectiveTransform> = {
   show: transformShow,
 }
 
-export function compile(
+export function compile( // jxh: 编译入口
   src: string | RootNode,
   options: CompilerOptions = {},
 ): CodegenResult {

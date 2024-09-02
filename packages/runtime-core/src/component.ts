@@ -1028,7 +1028,7 @@ export function finishComponentSetup(
             extend(finalCompilerOptions.compatConfig, Component.compatConfig)
           }
         }
-        Component.render = compile(template, finalCompilerOptions)
+        Component.render = compile(template, finalCompilerOptions) // jxh: 运行时编译
         if (__DEV__) {
           endMeasure(instance, `compile`)
         }
