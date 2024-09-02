@@ -99,7 +99,7 @@ export type EmitFn<
           }[Event]
         >
 
-export function emit(
+export function emit( // jxh: 组件emit函数
   instance: ComponentInternalInstance,
   event: string,
   ...rawArgs: any[]
@@ -178,7 +178,7 @@ export function emit(
   }
 
   let handlerName
-  let handler =
+  let handler = // jxh: 获取event对应的处理器
     props[(handlerName = toHandlerKey(event))] ||
     // also try camelCase event handler (#2249)
     props[(handlerName = toHandlerKey(camelize(event)))]
@@ -189,7 +189,7 @@ export function emit(
   }
 
   if (handler) {
-    callWithAsyncErrorHandling(
+    callWithAsyncErrorHandling( // jxh: 执行event处理器
       handler,
       instance,
       ErrorCodes.COMPONENT_EVENT_HANDLER,

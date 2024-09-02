@@ -186,7 +186,7 @@ type NormalizedProp = PropOptions & {
 export type NormalizedProps = Record<string, NormalizedProp>
 export type NormalizedPropsOptions = [NormalizedProps, string[]] | []
 
-export function initProps(
+export function initProps( // jxh: 初始化组件属性
   instance: ComponentInternalInstance,
   rawProps: Data | null,
   isStateful: number, // result of bitwise flag comparison

@@ -1125,7 +1125,7 @@ function baseCreateRenderer( // jxh: 创建渲染器
     }
   }
 
-  const processComponent = (
+  const processComponent = ( // jxh: 渲染组件
     n1: VNode | null,
     n2: VNode,
     container: RendererElement,

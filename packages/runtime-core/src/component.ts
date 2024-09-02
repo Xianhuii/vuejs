@@ -222,9 +222,9 @@ export interface FunctionalComponent<
     props: P & EmitsToProps<EE>,
     ctx: Omit<SetupContext<EE, IfAny<S, {}, SlotsType<S>>>, 'expose'>,
   ): any
-  props?: ComponentPropsOptions<P>
-  emits?: EE | (keyof EE)[]
-  slots?: IfAny<S, Slots, SlotsType<S>>
+  props?: ComponentPropsOptions<P> // jxh: 属性
+  emits?: EE | (keyof EE)[] // jxh: emit处理器
+  slots?: IfAny<S, Slots, SlotsType<S>> // jxh: slot
   inheritAttrs?: boolean
   displayName?: string
   compatConfig?: CompatConfig
@@ -456,7 +456,7 @@ export interface ComponentInternalInstance {
   data: Data
   props: Data
   attrs: Data
-  slots: InternalSlots
+  slots: InternalSlots // jxh: slot
   refs: Data
   emit: EmitFn
 
@@ -804,18 +804,18 @@ export function setupComponent(
 
   const { props, children } = instance.vnode
   const isStateful = isStatefulComponent(instance)
-  initProps(instance, props, isStateful, isSSR)
-  initSlots(instance, children, optimized)
+  initProps(instance, props, isStateful, isSSR) // jxh: 初始化属性
+  initSlots(instance, children, optimized) // jxh: 初始化slot
 
   const setupResult = isStateful
-    ? setupStatefulComponent(instance, isSSR)
+    ? setupStatefulComponent(instance, isSSR) // jxh: 初始化组件
     : undefined
 
   isSSR && setInSSRSetupState(false)
   return setupResult
 }
 
-function setupStatefulComponent(
+function setupStatefulComponent( // jxh: 初始化组件
   instance: ComponentInternalInstance,
   isSSR: boolean,
 ) {

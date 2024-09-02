@@ -176,7 +176,7 @@ const assignSlots = (
   }
 }
 
-export const initSlots = (
+export const initSlots = ( // jxh: 初始化组件slot
   instance: ComponentInternalInstance,
   children: VNodeNormalizedChildren,
   optimized: boolean,
@@ -194,7 +194,7 @@ export const initSlots = (
       normalizeObjectSlots(children as RawSlots, slots, instance)
     }
   } else if (children) {
-    normalizeVNodeSlots(instance, children)
+    normalizeVNodeSlots(instance, children) // jxh: slot被处理成子节点
   }
 }
 
