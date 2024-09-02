@@ -309,7 +309,7 @@ export const queuePostRenderEffect: (
  * })
  * ```
  */
-export function createRenderer<
+export function createRenderer< // jxh: 创建渲染器
   HostNode = RendererNode,
   HostElement = RendererElement,
 >(options: RendererOptions<HostNode, HostElement>): Renderer<HostElement> {
@@ -319,7 +319,7 @@ export function createRenderer<
 // Separate API for creating hydration-enabled renderer.
 // Hydration logic is only used when calling this function, making it
 // tree-shakable.
-export function createHydrationRenderer(
+export function createHydrationRenderer( // jxh: 创建渲染器
   options: RendererOptions<Node, Element>,
 ): HydrationRenderer {
   return baseCreateRenderer(options, createHydrationFunctions)
@@ -338,7 +338,7 @@ function baseCreateRenderer(
 ): HydrationRenderer
 
 // implementation
-function baseCreateRenderer(
+function baseCreateRenderer( // jxh: 创建渲染器
   options: RendererOptions,
   createHydrationFns?: typeof createHydrationFunctions,
 ): any {
@@ -370,10 +370,10 @@ function baseCreateRenderer(
 
   // Note: functions inside this closure should use `const xxx = () => {}`
   // style in order to prevent being inlined by minifiers.
-  const patch: PatchFn = (
-    n1,
-    n2,
-    container,
+  const patch: PatchFn = ( // jxh: 更新元素（diff算法）
+    n1, // jxh: 旧虚拟节点
+    n2, // jxh: 新虚拟节点
+    container, // jxh: 渲染容器
     anchor = null,
     parentComponent = null,
     parentSuspense = null,
@@ -381,12 +381,12 @@ function baseCreateRenderer(
     slotScopeIds = null,
     optimized = __DEV__ && isHmrUpdating ? false : !!n2.dynamicChildren,
   ) => {
-    if (n1 === n2) {
+    if (n1 === n2) { // jxh: 虚拟节点不变，直接返回
       return
     }
 
     // patching & not same type, unmount old tree
-    if (n1 && !isSameVNodeType(n1, n2)) {
+    if (n1 && !isSameVNodeType(n1, n2)) { // jxh: 存在旧虚拟节点&虚拟节点类型不同（卸载旧虚拟节点）
       anchor = getNextHostNode(n1)
       unmount(n1, parentComponent, parentSuspense, true)
       n1 = null
@@ -397,22 +397,22 @@ function baseCreateRenderer(
       n2.dynamicChildren = null
     }
 
-    const { type, ref, shapeFlag } = n2
+    const { type, ref, shapeFlag } = n2 // jxh: 新虚拟节点
     switch (type) {
-      case Text:
+      case Text: // jxh: 文本类型
         processText(n1, n2, container, anchor)
         break
-      case Comment:
+      case Comment: // jxh: 注释类型
         processCommentNode(n1, n2, container, anchor)
         break
-      case Static:
+      case Static: // jxh: 静态类型（html内容）
         if (n1 == null) {
           mountStaticNode(n2, container, anchor, namespace)
         } else if (__DEV__) {
           patchStaticNode(n1, n2, container, namespace)
         }
         break
-      case Fragment:
+      case Fragment: // jxh: 片段类型
         processFragment(
           n1,
           n2,
@@ -426,7 +426,7 @@ function baseCreateRenderer(
         )
         break
       default:
-        if (shapeFlag & ShapeFlags.ELEMENT) {
+        if (shapeFlag & ShapeFlags.ELEMENT) { // jxh: 元素
           processElement(
             n1,
             n2,
@@ -438,7 +438,7 @@ function baseCreateRenderer(
             slotScopeIds,
             optimized,
           )
-        } else if (shapeFlag & ShapeFlags.COMPONENT) {
+        } else if (shapeFlag & ShapeFlags.COMPONENT) { // jxh: 组件
           processComponent(
             n1,
             n2,
@@ -450,7 +450,7 @@ function baseCreateRenderer(
             slotScopeIds,
             optimized,
           )
-        } else if (shapeFlag & ShapeFlags.TELEPORT) {
+        } else if (shapeFlag & ShapeFlags.TELEPORT) { // jxh: 内置teleport特殊处理
           ;(type as typeof TeleportImpl).process(
             n1 as TeleportVNode,
             n2 as TeleportVNode,
@@ -482,27 +482,27 @@ function baseCreateRenderer(
     }
 
     // set ref
-    if (ref != null && parentComponent) {
+    if (ref != null && parentComponent) { // jxh: 设置子虚拟节点引用
       setRef(ref, n1 && n1.ref, parentSuspense, n2 || n1, !n2)
     }
   }
 
-  const processText: ProcessTextOrCommentFn = (n1, n2, container, anchor) => {
-    if (n1 == null) {
-      hostInsert(
-        (n2.el = hostCreateText(n2.children as string)),
+  const processText: ProcessTextOrCommentFn = (n1, n2, container, anchor) => { // jxh: 文本虚拟节点渲染
+    if (n1 == null) { // jxh: 旧虚拟节点为空：直接插入
+      hostInsert( // jxh: 插入真实节点
+        (n2.el = hostCreateText(n2.children as string)), // jxh: 创建文本真实DOM节点
         container,
         anchor,
       )
-    } else {
+    } else { // jxh: 旧节点不为空，更新
       const el = (n2.el = n1.el!)
-      if (n2.children !== n1.children) {
-        hostSetText(el, n2.children as string)
+      if (n2.children !== n1.children) { // jxh: 内容不同时更新，节省性能
+        hostSetText(el, n2.children as string) // jxh: 修改真实节点的文本内容
       }
     }
   }
 
-  const processCommentNode: ProcessTextOrCommentFn = (
+  const processCommentNode: ProcessTextOrCommentFn = ( // jxh: 注释虚拟节点渲染
     n1,
     n2,
     container,
@@ -510,7 +510,7 @@ function baseCreateRenderer(
   ) => {
     if (n1 == null) {
       hostInsert(
-        (n2.el = hostCreateComment((n2.children as string) || '')),
+        (n2.el = hostCreateComment((n2.children as string) || '')), // jxh: 创建注释真实DOM节点
         container,
         anchor,
       )
@@ -630,7 +630,7 @@ function baseCreateRenderer(
     }
   }
 
-  const mountElement = (
+  const mountElement = ( // jxh: 挂载虚拟DOM节点
     vnode: VNode,
     container: RendererElement,
     anchor: RendererNode | null,
@@ -644,7 +644,7 @@ function baseCreateRenderer(
     let vnodeHook: VNodeHook | undefined | null
     const { props, shapeFlag, transition, dirs } = vnode
 
-    el = vnode.el = hostCreateElement(
+    el = vnode.el = hostCreateElement( // jxh: 创建真实DOM节点
       vnode.type as string,
       namespace,
       props && props.is,
@@ -653,9 +653,9 @@ function baseCreateRenderer(
 
     // mount children first, since some props may rely on child content
     // being already rendered, e.g. `<select value>`
-    if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+    if (shapeFlag & ShapeFlags.TEXT_CHILDREN) { // jxh: 子元素是文本
       hostSetElementText(el, vnode.children as string)
-    } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+    } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) { // jxh: 子元素是数组
       mountChildren(
         vnode.children as VNodeArrayChildren,
         el,
@@ -674,7 +674,7 @@ function baseCreateRenderer(
     // scopeId
     setScopeId(el, vnode, vnode.scopeId, slotScopeIds, parentComponent)
     // props
-    if (props) {
+    if (props) { // jxh: 设置属性
       for (const key in props) {
         if (key !== 'value' && !isReservedProp(key)) {
           hostPatchProp(el, key, null, props[key], namespace, parentComponent)
@@ -692,7 +692,7 @@ function baseCreateRenderer(
       if ('value' in props) {
         hostPatchProp(el, 'value', null, props.value, namespace)
       }
-      if ((vnodeHook = props.onVnodeBeforeMount)) {
+      if ((vnodeHook = props.onVnodeBeforeMount)) { // jxh: 执行onVnodeBeforeMount回调
         invokeVNodeHook(vnodeHook, parentComponent, vnode)
       }
     }
@@ -707,13 +707,13 @@ function baseCreateRenderer(
     }
     // #1583 For inside suspense + suspense not resolved case, enter hook should call when suspense resolved
     // #1689 For inside suspense + suspense resolved case, just call it
-    const needCallTransitionHooks = needTransition(parentSuspense, transition)
+    const needCallTransitionHooks = needTransition(parentSuspense, transition) // Transition内置组件特殊处理
     if (needCallTransitionHooks) {
       transition!.beforeEnter(el)
     }
-    hostInsert(el, container, anchor)
+    hostInsert(el, container, anchor) // jxh: 将真实DOM节点添加到容器上
     if (
-      (vnodeHook = props && props.onVnodeMounted) ||
+      (vnodeHook = props && props.onVnodeMounted) ||　// jxh: 执行onVnodeMounted回调
       needCallTransitionHooks ||
       dirs
     ) {
@@ -767,7 +767,7 @@ function baseCreateRenderer(
     }
   }
 
-  const mountChildren: MountChildrenFn = (
+  const mountChildren: MountChildrenFn = ( // jxh: 挂载子元素数组
     children,
     container,
     anchor,
@@ -796,7 +796,7 @@ function baseCreateRenderer(
     }
   }
 
-  const patchElement = (
+  const patchElement = ( // jxh: 更新元素
     n1: VNode,
     n2: VNode,
     parentComponent: ComponentInternalInstance | null,
@@ -859,7 +859,7 @@ function baseCreateRenderer(
       }
     } else if (!optimized) {
       // full diff
-      patchChildren(
+      patchChildren( // jxh: diff算法比较&更新子节点（递归）
         n1,
         n2,
         el,
@@ -877,13 +877,13 @@ function baseCreateRenderer(
       // generated by the compiler and can take the fast path.
       // in this path old node and new node are guaranteed to have the same shape
       // (i.e. at the exact same position in the source template)
-      if (patchFlag & PatchFlags.FULL_PROPS) {
+      if (patchFlag & PatchFlags.FULL_PROPS) { // jxh: diff算法更新属性
         // element props contain dynamic keys, full diff needed
         patchProps(el, oldProps, newProps, parentComponent, namespace)
       } else {
         // class
         // this flag is matched when the element has dynamic class bindings.
-        if (patchFlag & PatchFlags.CLASS) {
+        if (patchFlag & PatchFlags.CLASS) {// jxh: diff算法更新class属性
           if (oldProps.class !== newProps.class) {
             hostPatchProp(el, 'class', null, newProps.class, namespace)
           }
@@ -891,7 +891,7 @@ function baseCreateRenderer(
 
         // style
         // this flag is matched when the element has dynamic style bindings
-        if (patchFlag & PatchFlags.STYLE) {
+        if (patchFlag & PatchFlags.STYLE) {// jxh: diff算法更新style属性
           hostPatchProp(el, 'style', oldProps.style, newProps.style, namespace)
         }
 
@@ -918,18 +918,18 @@ function baseCreateRenderer(
 
       // text
       // This flag is matched when the element has only dynamic text children.
-      if (patchFlag & PatchFlags.TEXT) {
+      if (patchFlag & PatchFlags.TEXT) { // jxh: 更新文本
         if (n1.children !== n2.children) {
           hostSetElementText(el, n2.children as string)
         }
       }
     } else if (!optimized && dynamicChildren == null) {
       // unoptimized, full diff
-      patchProps(el, oldProps, newProps, parentComponent, namespace)
+      patchProps(el, oldProps, newProps, parentComponent, namespace) // jxh: diff算法更新属性
     }
 
     if ((vnodeHook = newProps.onVnodeUpdated) || dirs) {
-      queuePostRenderEffect(() => {
+      queuePostRenderEffect(() => { // jxh: 执行回调函数
         vnodeHook && invokeVNodeHook(vnodeHook, parentComponent, n2, n1)
         dirs && invokeDirectiveHook(n2, n1, parentComponent, 'updated')
       }, parentSuspense)
@@ -1138,7 +1138,7 @@ function baseCreateRenderer(
   ) => {
     n2.slotScopeIds = slotScopeIds
     if (n1 == null) {
-      if (n2.shapeFlag & ShapeFlags.COMPONENT_KEPT_ALIVE) {
+      if (n2.shapeFlag & ShapeFlags.COMPONENT_KEPT_ALIVE) { // jxh: keep-alive组件特殊处理
         ;(parentComponent!.ctx as KeepAliveContext).activate(
           n2,
           container,
@@ -1147,7 +1147,7 @@ function baseCreateRenderer(
           optimized,
         )
       } else {
-        mountComponent(
+        mountComponent( // jxh: 挂载组件
           n2,
           container,
           anchor,
@@ -1158,11 +1158,11 @@ function baseCreateRenderer(
         )
       }
     } else {
-      updateComponent(n1, n2, optimized)
+      updateComponent(n1, n2, optimized) // jxh: 更新组件
     }
   }
 
-  const mountComponent: MountComponentFn = (
+  const mountComponent: MountComponentFn = ( // jxh: 挂载组件
     initialVNode,
     container,
     anchor,
@@ -1175,7 +1175,7 @@ function baseCreateRenderer(
     // mounting
     const compatMountInstance =
       __COMPAT__ && initialVNode.isCompatRoot && initialVNode.component
-    const instance: ComponentInternalInstance =
+    const instance: ComponentInternalInstance = // jxh: 获取组件实例对象
       compatMountInstance ||
       (initialVNode.component = createComponentInstance(
         initialVNode,
@@ -1202,7 +1202,7 @@ function baseCreateRenderer(
       if (__DEV__) {
         startMeasure(instance, `init`)
       }
-      setupComponent(instance, false, optimized)
+      setupComponent(instance, false, optimized) // jxh: 初始化组件
       if (__DEV__) {
         endMeasure(instance, `init`)
       }
@@ -1221,7 +1221,7 @@ function baseCreateRenderer(
         processCommentNode(null, placeholder, container!, anchor)
       }
     } else {
-      setupRenderEffect(
+      setupRenderEffect( // jxh: 设置渲染副作用函数
         instance,
         initialVNode,
         container,
@@ -1548,7 +1548,7 @@ function baseCreateRenderer(
 
     // create reactive effect for rendering
     instance.scope.on()
-    const effect = (instance.effect = new ReactiveEffect(componentUpdateFn))
+    const effect = (instance.effect = new ReactiveEffect(componentUpdateFn)) // jxh: 创建响应式副作用函数
     instance.scope.off()
 
     const update = (instance.update = effect.run.bind(effect))
@@ -1711,7 +1711,7 @@ function baseCreateRenderer(
     const newLength = c2.length
     const commonLength = Math.min(oldLength, newLength)
     let i
-    for (i = 0; i < commonLength; i++) {
+    for (i = 0; i < commonLength; i++) { // jxh: 遍历新旧虚拟节点，进行更新
       const nextChild = (c2[i] = optimized
         ? cloneIfMounted(c2[i] as VNode)
         : normalizeVNode(c2[i]))
@@ -1727,7 +1727,7 @@ function baseCreateRenderer(
         optimized,
       )
     }
-    if (oldLength > newLength) {
+    if (oldLength > newLength) { // jxh: 移除多余旧节点
       // remove old
       unmountChildren(
         c1,
@@ -1737,7 +1737,7 @@ function baseCreateRenderer(
         false,
         commonLength,
       )
-    } else {
+    } else { // jxh: 挂载多的新节点
       // mount new
       mountChildren(
         c2,
@@ -1754,7 +1754,7 @@ function baseCreateRenderer(
   }
 
   // can be all-keyed or mixed
-  const patchKeyedChildren = (
+  const patchKeyedChildren = ( // jxh: 快速diff算法
     c1: VNode[],
     c2: VNodeArrayChildren,
     container: RendererElement,
@@ -1773,7 +1773,7 @@ function baseCreateRenderer(
     // 1. sync from start
     // (a b) c
     // (a b) d e
-    while (i <= e1 && i <= e2) {
+    while (i <= e1 && i <= e2) { // jxh: 从头到尾比较（更新元素信息）
       const n1 = c1[i]
       const n2 = (c2[i] = optimized
         ? cloneIfMounted(c2[i] as VNode)
@@ -1799,7 +1799,7 @@ function baseCreateRenderer(
     // 2. sync from end
     // a (b c)
     // d e (b c)
-    while (i <= e1 && i <= e2) {
+    while (i <= e1 && i <= e2) { // jxh: 从尾到头比较（更新元素信息）
       const n1 = c1[e1]
       const n2 = (c2[e2] = optimized
         ? cloneIfMounted(c2[e2] as VNode)
@@ -1830,7 +1830,7 @@ function baseCreateRenderer(
     // (a b)
     // c (a b)
     // i = 0, e1 = -1, e2 = 0
-    if (i > e1) {
+    if (i > e1) { // jxh: 移动元素
       if (i <= e2) {
         const nextPos = e2 + 1
         const anchor = nextPos < l2 ? (c2[nextPos] as VNode).el : parentAnchor
@@ -1860,7 +1860,7 @@ function baseCreateRenderer(
     // a (b c)
     // (b c)
     // i = 0, e1 = 0, e2 = -1
-    else if (i > e2) {
+    else if (i > e2) { // jxh: 卸载元素
       while (i <= e1) {
         unmount(c1[i], parentComponent, parentSuspense, true)
         i++
@@ -1871,7 +1871,7 @@ function baseCreateRenderer(
     // [i ... e1 + 1]: a b [c d e] f g
     // [i ... e2 + 1]: a b [e d c h] f g
     // i = 2, e1 = 4, e2 = 5
-    else {
+    else { // jxh: 不知道元素顺序
       const s1 = i // prev starting index
       const s2 = i // next starting index
 
@@ -2061,7 +2061,7 @@ function baseCreateRenderer(
     }
   }
 
-  const unmount: UnmountFn = (
+  const unmount: UnmountFn = ( // jxh: 卸载
     vnode,
     parentComponent,
     parentSuspense,
@@ -2107,10 +2107,10 @@ function baseCreateRenderer(
       shouldInvokeVnodeHook &&
       (vnodeHook = props && props.onVnodeBeforeUnmount)
     ) {
-      invokeVNodeHook(vnodeHook, parentComponent, vnode)
+      invokeVNodeHook(vnodeHook, parentComponent, vnode) // jxh: 触发onVnodeBeforeUnmount回调
     }
 
-    if (shapeFlag & ShapeFlags.COMPONENT) {
+    if (shapeFlag & ShapeFlags.COMPONENT) { // jxh: 卸载组件
       unmountComponent(vnode.component!, parentSuspense, doRemove)
     } else {
       if (__FEATURE_SUSPENSE__ && shapeFlag & ShapeFlags.SUSPENSE) {
@@ -2345,13 +2345,13 @@ function baseCreateRenderer(
   }
 
   let isFlushing = false
-  const render: RootRenderFunction = (vnode, container, namespace) => {
+  const render: RootRenderFunction = (vnode, container, namespace) => { // jxh: 渲染
     if (vnode == null) {
-      if (container._vnode) {
+      if (container._vnode) { // jxh: 卸载（旧vnode存在&新vnode不存在）
         unmount(container._vnode, null, null, true)
       }
     } else {
-      patch(
+      patch( // jxh: 打补丁
         container._vnode || null,
         vnode,
         container,
@@ -2361,7 +2361,7 @@ function baseCreateRenderer(
         namespace,
       )
     }
-    container._vnode = vnode
+    container._vnode = vnode // jxh: 更新容器中的vnode
     if (!isFlushing) {
       isFlushing = true
       flushPreFlushCbs()

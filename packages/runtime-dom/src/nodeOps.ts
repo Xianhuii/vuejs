@@ -42,7 +42,7 @@ const doc = (typeof document !== 'undefined' ? document : null) as Document
 const templateContainer = doc && /*#__PURE__*/ doc.createElement('template')
 
 export const nodeOps: Omit<RendererOptions<Node, Element>, 'patchProp'> = {
-  insert: (child, parent, anchor) => {
+  insert: (child, parent, anchor) => { // jxh: 插入真实DOM节点
     parent.insertBefore(child, anchor || null)
   },
 
@@ -53,8 +53,8 @@ export const nodeOps: Omit<RendererOptions<Node, Element>, 'patchProp'> = {
     }
   },
 
-  createElement: (tag, namespace, is, props): Element => {
-    const el =
+  createElement: (tag, namespace, is, props): Element => { // jxh: 创建真实DOM元素节点
+    const el = // jxh: 创建真实DOM节点
       namespace === 'svg'
         ? doc.createElementNS(svgNS, tag)
         : namespace === 'mathml'
@@ -63,18 +63,18 @@ export const nodeOps: Omit<RendererOptions<Node, Element>, 'patchProp'> = {
             ? doc.createElement(tag, { is })
             : doc.createElement(tag)
 
-    if (tag === 'select' && props && props.multiple != null) {
+    if (tag === 'select' && props && props.multiple != null) { // jxh: 设置multiple属性
       ;(el as HTMLSelectElement).setAttribute('multiple', props.multiple)
     }
 
     return el
   },
 
-  createText: text => doc.createTextNode(text),
+  createText: text => doc.createTextNode(text), // jxh: 创建文本真实DOM
 
-  createComment: text => doc.createComment(text),
+  createComment: text => doc.createComment(text), // jxh: 创建注释真实DOM
 
-  setText: (node, text) => {
+  setText: (node, text) => { // jxh: 修改真实DOM节点的文本内容
     node.nodeValue = text
   },
 
@@ -96,7 +96,7 @@ export const nodeOps: Omit<RendererOptions<Node, Element>, 'patchProp'> = {
   // Reason: innerHTML.
   // Static content here can only come from compiled templates.
   // As long as the user only uses trusted templates, this is safe.
-  insertStaticContent(content, parent, anchor, namespace, start, end) {
+  insertStaticContent(content, parent, anchor, namespace, start, end) { // jxh: 渲染HTML静态内容
     // <parent> before | first ... last | anchor </parent>
     const before = anchor ? anchor.previousSibling : parent.lastChild
     // #5308 can only take cached path if:

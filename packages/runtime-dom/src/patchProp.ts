@@ -16,7 +16,7 @@ const isNativeOn = (key: string) =>
 
 type DOMRendererOptions = RendererOptions<Node, Element>
 
-export const patchProp: DOMRendererOptions['patchProp'] = (
+export const patchProp: DOMRendererOptions['patchProp'] = ( // jxh: 设置真实DOM节点的属性
   el,
   key,
   prevValue,
@@ -25,11 +25,11 @@ export const patchProp: DOMRendererOptions['patchProp'] = (
   parentComponent,
 ) => {
   const isSVG = namespace === 'svg'
-  if (key === 'class') {
+  if (key === 'class') { // jxh: class属性
     patchClass(el, nextValue, isSVG)
-  } else if (key === 'style') {
+  } else if (key === 'style') { // jxh: style属性
     patchStyle(el, prevValue, nextValue)
-  } else if (isOn(key)) {
+  } else if (isOn(key)) { // jxh: on开头的代表事件
     // ignore v-model listeners
     if (!isModelListener(key)) {
       patchEvent(el, key, prevValue, nextValue, parentComponent)
@@ -40,7 +40,7 @@ export const patchProp: DOMRendererOptions['patchProp'] = (
       : key[0] === '^'
         ? ((key = key.slice(1)), false)
         : shouldSetAsProp(el, key, nextValue, isSVG)
-  ) {
+  ) { // jxh: 其他常规属性
     patchDOMProp(el, key, nextValue, parentComponent)
     // #6007 also set form state as attributes so they work with
     // <input type="reset"> or libs / extensions that expect attributes
@@ -51,7 +51,7 @@ export const patchProp: DOMRendererOptions['patchProp'] = (
     ) {
       patchAttr(el, key, nextValue, isSVG, parentComponent, key !== 'value')
     }
-  } else {
+  } else { // jxh: 布尔值属性需要特殊处理
     // special case for <input v-model type="checkbox"> with
     // :true-value & :false-value
     // store value as dom properties since non-string values will be

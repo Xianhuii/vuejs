@@ -543,7 +543,7 @@ export const createVNode = (
   __DEV__ ? createVNodeWithArgsTransform : _createVNode
 ) as typeof _createVNode
 
-function _createVNode(
+function _createVNode( // jxh: 创建虚拟节点
   type: VNodeTypes | ClassComponent | typeof NULL_DYNAMIC_COMPONENT,
   props: (Data & VNodeProps) | null = null,
   children: unknown = null,
